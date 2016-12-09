@@ -20,7 +20,9 @@
                          [1 0]  [-1 0]
                          [-1 0]  [1 0]})
 
-(defn update-direction [state new-direction]
+(defn update-direction
+  "Update direction to new-direction unless it is the opposite of current direction"
+  [state new-direction]
   (if (= new-direction (opposite-direction (:direction state)))
     ;; do not change
     state
@@ -47,9 +49,9 @@
   (let [snakee (:snakee state)]
     (if (apply distinct? snakee)
       state
-      (assoc state :snakee (or (list (first snakee)) (list [50 50]))))))
+      (assoc state :snakee (list (first snakee))))))
 
-;; returns string for display
+;; returns string for display, doesn't affect state
 (defn score
   "Show score"
   [state]
@@ -67,6 +69,7 @@
   "Move a snake"
   [state]
   (if (:pause state)
+    ;; no movement
     state
     (let [snakee (:snakee state)
           [dx dy] (:direction state)
@@ -82,6 +85,7 @@
             (update :snakee conj new-point))))))
 
 (defn setup []
+  "Return initial state of game"
   (q/smooth)
   (q/frame-rate 10)
   ;; state map
@@ -106,7 +110,7 @@
     (q/background 0 0 0)
 
     (doseq [[x y] (:food state)]
-      ;; better to `apply` to full colour
+      ;; better to `apply` colour than to pull apart RGB args
       (apply q/fill colour)
       (apply q/stroke colour)
       (q/rect (* w x) (* h y) w h))
