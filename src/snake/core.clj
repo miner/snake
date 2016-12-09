@@ -24,19 +24,30 @@
           (>= x m) (recur (- x m))
           :else x)))
 
+(def opposite-direction {[0 1]  [0 -1]
+                         [0 -1] [0 1]
+                         [1 0]  [-1 0]
+                         [-1 0]  [1 0]})
 
+(defn update-direction [state new-direction]
+  (if (= new-direction (opposite-direction (:direction state)))
+    ;; do not change
+    state
+    (assoc state :direction new-direction)))
+  
 (defn turn
   "Change direction for the snake to move"
   [state event]
   (let [direction (:direction state)]
     (case (:key event)
-      (:w :up) (if (not= [0 1] direction) (assoc state :direction [0 -1]) state)
-      (:s :down) (if (not= [0 -1] direction) (assoc state :direction [0 1]) state)
-      (:a :left) (if (not= [1 0] direction) (assoc state :direction [-1 0]) state)
-      (:d :right) (if (not= [-1 0] direction) (assoc state :direction [1 0]) state)
+      (:w :up)    (update-direction state [0 -1])
+      (:s :down)  (update-direction state [0 1])
+      (:a :left)  (update-direction state  [-1 0])
+      (:d :right) (update-direction state [1 0])
       (case (:key-code event)
         ;; space, return, newline, tab
         (32 13 10 9) (update state :pause not)
+        ;; default ignore key
         state))))
 
 (defn reset
