@@ -15,15 +15,6 @@
   [state]
   (update state :food disj (first (:snakee state))))
 
-;; SEM -- use mod instead of recur
-#_ (defn wrap
-  "Wrap a snake around the board"
-  [i m]
-  (loop [x i]
-    (cond (< x 0) (recur (+ x m))
-          (>= x m) (recur (- x m))
-          :else x)))
-
 (def opposite-direction {[0 1]  [0 -1]
                          [0 -1] [0 1]
                          [1 0]  [-1 0]
