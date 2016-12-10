@@ -12,8 +12,8 @@
 
 (defn remove-food
   "Remove food when eaten"
-  [state]
-  (update state :food disj (first (:snakee state))))
+  [state point]
+  (update state :food disj point))
 
 (def opposite-direction {[0 1]  [0 -1]
                          [0 -1] [0 1]
@@ -38,7 +38,7 @@
       (:a :left)  (update-direction state  [-1 0])
       (:d :right) (update-direction state [1 0])
       (case (:key-code event)
-        ;; space, return, newline, tab
+        ;; space, return, newline, tab -- pause snake
         (32 13 10 9) (update state :pause not)
         ;; default ignore key
         state))))
@@ -47,9 +47,10 @@
   "Reset a snake if it touches itself"
   [state]
   (let [snakee (:snakee state)]
-    (if (apply distinct? snakee)
-      state
-      (assoc state :snakee (list (first snakee))))))
+    ;; check if head is touching rest of snake
+    (if (some #{(first snakee)} (rest snakee))
+      (assoc state :snakee (list (first snakee)))
+      state)))
 
 ;; returns string for display, doesn't affect state
 (defn score
@@ -72,17 +73,18 @@
     ;; no movement
     state
     (let [snakee (:snakee state)
+          head (first snakee)
           [dx dy] (:direction state)
-          new-point [(mod (+ (ffirst snakee) dx) (state :width))
-                     (mod (+ (second (first snakee)) dy) (state :height))]]
-      (if (contains? (:food state) (first snakee))
+          new-head [(mod (+ (first head) dx) (state :width))
+                    (mod (+ (second head) dy) (state :height))]]
+      (if (contains? (:food state) head)
         (-> state
-            (remove-food)
+            (remove-food head)
             (paint-food)
-            (update :snakee conj new-point))
+            (update :snakee conj new-head))
         (-> state
             (update :snakee butlast)
-            (update :snakee conj new-point))))))
+            (update :snakee conj new-head))))))
 
 (defn setup []
   "Return initial state of game"
