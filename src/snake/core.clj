@@ -38,7 +38,7 @@
       (:a :left)  (update-direction state  [-1 0])
       (:d :right) (update-direction state [1 0])
       (case (:key-code event)
-        ;; space, return, newline, tab -- pause snake
+        ;; space, return, newline, tab -- toggle pause
         (32 13 10 9) (update state :pause not)
         ;; default ignore key
         state))))
