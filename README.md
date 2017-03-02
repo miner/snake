@@ -20,3 +20,17 @@ Copyright © 2014
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
+
+-----
+
+Note about this fork...
+
+You can find the original presentation video here:
+
+https://skillsmatter.com/skillscasts/9154-quil-it-a-lightweight-introduction-to-quil-library
+
+SEM:  The presentation shows code that keeps the state of the game in several atoms.  I revised
+the code to use a more functional style, with no need for atoms.  This repository is my
+forked version of the game.
+
+
