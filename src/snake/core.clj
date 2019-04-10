@@ -44,12 +44,16 @@
         ;; default ignore key
         state))))
 
+;; faster than (some (set ...) ...)
+(defn in? [x coll]
+  (reduce (fn [r a] (if (= a x) (reduced true) r)) false coll))
+
 (defn reset
   "Reset a snake if it touches itself"
   [state]
   (let [snakee (:snakee state)]
     ;; check if head is touching rest of snake
-    (if (some #{(peek snakee)} (pop snakee))
+    (if (in? (peek snakee) (pop snakee))
       (assoc state :snakee [(peek snakee)])
       state)))
 
