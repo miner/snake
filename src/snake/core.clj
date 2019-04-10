@@ -2,6 +2,7 @@
   (:require [quil.core :as q]
             [quil.middleware :as m]))
 
+;; changed snakee representation to a vector (instead of a list) for slightly better performance
 
 (defn spawn-food
   "Spawn food at interval 0.5"
@@ -48,8 +49,8 @@
   [state]
   (let [snakee (:snakee state)]
     ;; check if head is touching rest of snake
-    (if (some #{(first snakee)} (rest snakee))
-      (assoc state :snakee (list (first snakee)))
+    (if (some #{(peek snakee)} (pop snakee))
+      (assoc state :snakee [(peek snakee)])
       state)))
 
 ;; returns string for display, doesn't affect state
@@ -73,7 +74,7 @@
     ;; no movement
     state
     (let [snakee (:snakee state)
-          head (first snakee)
+          head (peek snakee)
           [dx dy] (:direction state)
           new-head [(mod (+ (first head) dx) (state :width))
                     (mod (+ (second head) dy) (state :height))]]
@@ -83,7 +84,7 @@
             (paint-food)
             (update :snakee conj new-head))
         (-> state
-            (update :snakee butlast)
+            (update :snakee subvec 1)
             (update :snakee conj new-head))))))
 
 (defn setup []
@@ -93,7 +94,7 @@
   ;; state map
   {:width 100
    :height 100
-   :snakee (list [50 50])
+   :snakee [[50 50]]
    :food #{}
    :direction [1 0]
    :colour [255 13 169]})
