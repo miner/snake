@@ -7,7 +7,7 @@
 (defn spawn-food
   "Spawn food at interval 0.5"
   [state]
-  (if (< (rand) 0.5)
+  (if (and (not (:pause state)) (< (rand) 0.5))
     (update state :food conj [(rand-int (:width state)) (rand-int (:width state))])
     state))
 
@@ -61,7 +61,7 @@
 (defn score
   "Show score"
   [state]
-  (str "Score: " (count (:snakee state))))
+  (str "Score: " (count (:snakee state)) (when (:pause state) "\npaused")))
 
 (defn paint-food
   "Create a fancy colour for the snake"
@@ -79,17 +79,20 @@
     state
     (let [snakee (:snakee state)
           head (peek snakee)
+          tail (snakee 0)
           [dx dy] (:direction state)
           new-head [(mod (+ (first head) dx) (state :width))
                     (mod (+ (second head) dy) (state :height))]]
-      (if (contains? (:food state) head)
-        (-> state
-            (remove-food head)
-            (paint-food)
-            (update :snakee conj new-head))
-        (-> state
-            (update :snakee subvec 1)
-            (update :snakee conj new-head))))))
+      ;; pause if the snake catches its tail
+      ;; you will need an arrow to turn before you can unpause
+      (cond (= new-head tail) (assoc state :pause true)
+            (contains? (:food state) head) (-> state
+                                               (remove-food head)
+                                               (paint-food)
+                                               (update :snakee conj new-head))
+            :else (-> state
+                      (update :snakee subvec 1)
+                      (update :snakee conj new-head))))))
 
 (defn setup []
   "Return initial state of game"
@@ -116,11 +119,12 @@
         h (quot (q/height) (:height state))]
     (q/background 0 0 0)
 
-    (doseq [[x y] (:food state)]
-      ;; better to `apply` colour than to pull apart RGB args
-      (apply q/fill colour)
-      (apply q/stroke colour)
-      (q/rect (* w x) (* h y) w h))
+    (when-not (:pause state)
+      (doseq [[x y] (:food state)]
+        ;; better to `apply` colour than to pull apart RGB args
+        (apply q/fill colour)
+        (apply q/stroke colour)
+        (q/rect (* w x) (* h y) w h)))
 
     (doseq [[x y] (:snakee state)]
         (q/fill (rand-int 255) (rand-int 255) (rand-int 255))
