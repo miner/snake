@@ -127,9 +127,9 @@
         (q/rect (* w x) (* h y) w h)))
 
     (doseq [[x y] (:snakee state)]
-        (q/fill (rand-int 255) (rand-int 255) (rand-int 255))
-        (q/stroke (rand-int 255) (rand-int 255) (rand-int 255))
-        (q/rect (* w x) (* h y) w h)))
+      (q/fill (rand-int 255) (rand-int 255) (rand-int 255))
+      (q/stroke (rand-int 255) (rand-int 255) (rand-int 255))
+      (q/rect (* w x) (* h y) w h)))
 
   (q/fill 100 255 100)
   (q/text-size 20)
